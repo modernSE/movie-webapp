@@ -26,6 +26,7 @@
                     <li th:text="${movie.year}">Year</li>
                 </ul>
             </div>
+            <a th:href="@{saveFavorite(id=${movie.imdbID},title=${movie.title})}" >In meine Sammlung!</a>
         </div>
 
         <div class="col-md-6">
