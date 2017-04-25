@@ -1,4 +1,4 @@
-package org.ferdi;
+package org.mse.moviewebapp.rest;
 
 import com.google.gson.annotations.SerializedName;
 

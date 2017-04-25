@@ -1,4 +1,4 @@
-package org.ferdi;
+package org.mse.moviewebapp;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
