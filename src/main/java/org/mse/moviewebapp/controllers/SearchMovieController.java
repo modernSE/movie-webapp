@@ -22,8 +22,6 @@ import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 
-import static java.util.Comparator.comparing;
-
 /**
  * Created by Ferdinand.Szekeresch on 20.04.2017.
  */
@@ -54,18 +52,6 @@ public class SearchMovieController {
                 return m1.getYear().compareTo(m2.getYear());
             }
         });
-
-        movies.sort((m1, m2) -> m1.getYear().compareTo(m2.getYear()));
-
-        movies.sort(this::compareMovies);
-
-        movies.sort(comparing(Movie::getYear));
-
-        movies.sort(comparing(m -> m.getYear()));
-
-        //effectively final
-
-
     }
 
     private int compareMovies(Movie m1, Movie m2) {

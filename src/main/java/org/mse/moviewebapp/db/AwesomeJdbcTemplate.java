@@ -1,5 +1,6 @@
 package org.mse.moviewebapp.db;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 /**
  * Created by ferdi on 4/25/17.
  */
+@Primary
 @Component
 public class AwesomeJdbcTemplate extends JdbcTemplate {
 

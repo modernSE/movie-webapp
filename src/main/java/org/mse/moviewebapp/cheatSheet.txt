@@ -1,0 +1,7 @@
+        movies.sort((m1, m2) -> m1.getYear().compareTo(m2.getYear()));
+
+        movies.sort(this::compareMovies);
+
+        movies.sort(comparing(Movie::getYear));
+
+        movies.sort(comparing(m -> m.getYear()));

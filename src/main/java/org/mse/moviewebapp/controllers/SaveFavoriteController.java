@@ -1,6 +1,5 @@
 package org.mse.moviewebapp.controllers;
 
-import org.mse.moviewebapp.db.AwesomeJdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,8 +28,27 @@ public class SaveFavoriteController {
     @RequestMapping("/saveFavorite")
     public @ResponseBody
     String saveFavorite(@RequestParam(name = "title", required = true) String title, @RequestParam(name = "id", required = true) String id) {
-        String insertStmt = "INSERT INTO favorites (title, id) VALUES (?,?)";
+        String checkForExistingIdStmt = "SELECT COUNT(*) FROM FAVORITES WHERE ID=?";
+        final Integer existingId = template.queryForObject(checkForExistingIdStmt, Integer.class, id);
 
+        if (existingId.equals(0)) {
+            doSaveFavorite(title, id);
+        }
+
+        final String extractFavoritesStmt = "SELECT id, title FROM FAVORITES;";
+        List<String> list = template.query(extractFavoritesStmt, new RowMapper<String>() {
+            @Override
+            public String mapRow(ResultSet resultSet, int i) throws SQLException {
+                return resultSet.getString(1) + ": " + resultSet.getString(2);
+            }
+        });
+
+        return list.stream().collect(Collectors.joining("<br/>"));
+    }
+
+    private void doSaveFavorite(@RequestParam(name = "title", required = true) String title,
+        @RequestParam(name = "id", required = true) String id) {
+        String insertStmt = "INSERT INTO favorites (title, id) VALUES (?,?)";
         template.batchUpdate(insertStmt, new BatchPreparedStatementSetter() {
 
             @Override
@@ -44,18 +62,6 @@ public class SaveFavoriteController {
                 return 1;
             }
         });
-
-
-        List<String> list = template.query("SELECT id, title FROM FAVORITES;", new RowMapper<String>() {
-            @Override
-            public String mapRow(ResultSet resultSet, int i) throws SQLException {
-                return resultSet.getString(1) + ": " + resultSet.getString(2);
-            }
-        });
-
-
-        return list.stream().collect(Collectors.joining("<br/>"));
     }
-
 
 }
