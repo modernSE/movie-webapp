@@ -1,26 +1,19 @@
 package org.mse.moviewebapp.controllers;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import org.mse.moviewebapp.rest.Movie;
+import org.mse.moviewebapp.rest.MovieDetail;
 import org.mse.moviewebapp.rest.OMDBResponseWrapper;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.client.ClientHttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.mse.moviewebapp.rest.OmdbSearchEndpoint;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Ferdinand.Szekeresch on 20.04.2017.
@@ -28,21 +21,32 @@ import java.util.List;
 @Controller
 public class SearchMovieController {
 
-    private static final String BASE_URL = "http://www.omdbapi.com/?";
+    @Autowired
+    private OmdbSearchEndpoint omdbSearchEndpoint;
 
     // @RequestParam()
     @RequestMapping("/search")
     public String search(@RequestParam(value = "name", required = false, defaultValue = "Star Wars") String name,
-        Model model) throws IOException {
-        final String query = UriUtils.encodeQuery("s=" + name, "UTF-8");
-        URI searchUri = URI.create(BASE_URL + query);
-        final OMDBResponseWrapper wrapper = doSearch(searchUri);
+                         Model model) throws IOException {
+
+        final OMDBResponseWrapper wrapper = omdbSearchEndpoint.search(name);
         List<Movie> movies = wrapper.getSearch();
 
         sortMovies(movies);
 
+        movies.stream().map(Movie::getImdbID).map(this::queryMovieDetail).filter(Optional::isPresent).map(Optional::get).map(MovieDetail::getActors).forEach(System.out::println);
+
         model.addAttribute("movies", movies);
         return "search";
+    }
+
+    Optional<MovieDetail> queryMovieDetail(final String imdbId) {
+        try {
+            return Optional.of(omdbSearchEndpoint.details(imdbId));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
     }
 
     private void sortMovies(List<Movie> movies) {
@@ -58,11 +62,4 @@ public class SearchMovieController {
         return m1.getYear().compareTo(m2.getYear());
     }
 
-    private OMDBResponseWrapper doSearch(URI searchUri) throws IOException {
-        OkHttp3ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory();
-        final ClientHttpRequest request = factory.createRequest(searchUri, HttpMethod.GET);
-        final ClientHttpResponse execute = request.execute();
-        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
-        return gson.fromJson(new InputStreamReader(execute.getBody()), new TypeToken<OMDBResponseWrapper>() {}.getType());
-    }
 }

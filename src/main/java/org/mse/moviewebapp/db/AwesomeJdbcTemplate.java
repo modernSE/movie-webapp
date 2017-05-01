@@ -11,8 +11,8 @@ import java.sql.SQLException;
 /**
  * Created by ferdi on 4/25/17.
  */
-@Primary
-@Component
+//@Primary
+//@Component
 public class AwesomeJdbcTemplate extends JdbcTemplate {
 
     public int[] batchUpdate(String sql, BatchPreparedStatementConsumer c, int batchSize) {
