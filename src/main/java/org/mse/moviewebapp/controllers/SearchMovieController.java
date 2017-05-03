@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by Ferdinand.Szekeresch on 20.04.2017.
@@ -34,9 +35,12 @@ public class SearchMovieController {
 
         sortMovies(movies);
 
-        movies.stream().map(Movie::getImdbID).map(this::queryMovieDetail).filter(Optional::isPresent).map(Optional::get).map(MovieDetail::getActors).forEach(System.out::println);
+//        movies.stream().map(Movie::getImdbID).map(this::queryMovieDetail).filter(Optional::isPresent).map(Optional::get).map(MovieDetail::getActors).forEach(System.out::println);
 
-        model.addAttribute("movies", movies);
+        final List<MovieDetail> movieDetails = movies.stream().map(Movie::getImdbID).map(this::queryMovieDetail)
+            .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+
+        model.addAttribute("movies", movieDetails);
         return "search";
     }
 

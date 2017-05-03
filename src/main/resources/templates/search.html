@@ -24,6 +24,8 @@
                 <h3 th:text="${movie.title}"></h3>
                 <ul>
                     <li th:text="${movie.year}">Year</li>
+                    <li th:text="${movie.actors}">Actors</li>
+                    <li th:text="${movie.director}">Director</li>
                 </ul>
             </div>
             <a th:href="@{saveFavorite(id=${movie.imdbID},title=${movie.title})}" >In meine Sammlung!</a>
